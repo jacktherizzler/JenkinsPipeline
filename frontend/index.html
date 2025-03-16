@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Web App</title>
+</head>
+<body>
+    <h1>Welcome to JenkinsPipeline App</h1>
+    <form id="userForm">
+        <input type="text" id="name" placeholder="Enter name" required>
+        <input type="email" id="email" placeholder="Enter email" required>
+        <button type="submit">Add User</button>
+    </form>
+    <h2>Users List</h2>
+    <ul id="userList"></ul>
+
+    <script>
+        document.getElementById('userForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            
+            fetch('http://localhost:5000/add_user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email })
+            }).then(response => response.json())
+              .then(data => alert(data.message))
+              .catch(error => console.error('Error:', error));
+        });
+
+        function fetchUsers() {
+            fetch('http://localhost:5000/users')
+                .then(response => response.json())
+                .then(users => {
+                    const userList = document.getElementById('userList');
+                    userList.innerHTML = '';
+                    users.forEach(user => {
+                        const li = document.createElement('li');
+                        li.textContent = `ID: ${user[0]} | Name: ${user[1]} | Email: ${user[2]}`;
+                        userList.appendChild(li);
+                    });
+                });
+        }
+
+        setInterval(fetchUsers, 5000);
+    </script>
+</body>
+</html>
